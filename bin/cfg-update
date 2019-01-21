@@ -97,7 +97,7 @@ done
 ln -nsf ../../bin/cfg-update .git/hooks/post-merge
 
 # Add/update remote repositories
-git remote add alberon git://github.com/alberon/dotfiles.git 2>/dev/null
+git remote add alberon git://github.com/danny-cain-dev/dotfiles.git 2>/dev/null
 git remote remove dd 2>/dev/null
 
 # Return true even if the last command above failed

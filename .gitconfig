@@ -1,10 +1,11 @@
 [user]
-    name = Alberon Ltd.
-    email = info@alberon.co.uk
+    name = Danny Cain
+    email = danny@alberon.co.uk
 
 [core]
     excludesfile = ~/.gitignore-global
     attributesfile = ~/.gitattributes-global
+	autocrlf = input
 
 [color]
     branch = auto
@@ -114,7 +115,7 @@
     yesterday    = log --decorate -p --since=yesterday
 
 [github]
-    user = alberon
+    user = danny-cain-dev
 
 [browser "none"]
     cmd = git-web-browser
