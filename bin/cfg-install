@@ -90,5 +90,7 @@ if [ ! -f ~/.bashrc_config ]; then
 
 fi
 
+composer update -d ~/.danny-scripts
+
 # No need to check for updates
 echo "$(date +%Y%m%d)" > ~/.cfg_last_update

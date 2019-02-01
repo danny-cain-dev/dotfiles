@@ -25,6 +25,8 @@ elif $WINDOWS; then
     PATH="$HOME/bin/win:$PATH"
 fi
 
+PATH="$HOME/.danny-scripts/binaries:$PATH"
+
 # Custom local scripts (specific to a machine so not in Git)
 PATH="$HOME/local/bin:$PATH"
 
