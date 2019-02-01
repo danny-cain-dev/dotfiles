@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "009b80e7ab29ceb9ad9eda5ca6dd16df",
+    "content-hash": "dbb09c31cbee3df17bb98d1dc84bbd21",
     "packages": [
         {
             "name": "danny.cain/crypto",
@@ -116,11 +116,11 @@
         },
         {
             "name": "danny.cain/introspect",
-            "version": "v0.3.1",
+            "version": "dev-master",
             "source": {
                 "type": "git",
                 "url": "gitea@rincewind.dannycain.com:lib/introspect.git",
-                "reference": "f9700f73a3cb004922f318e435be4b3f9b1fe84c"
+                "reference": "e19ca5f6e05dfe42f5f63c5418a54f5d71134941"
             },
             "require-dev": {
                 "mockery/mockery": "dev-master",
@@ -135,7 +135,7 @@
             "license": [
                 "MIT"
             ],
-            "time": "2018-11-04T12:18:40+00:00"
+            "time": "2019-02-01T15:05:32+00:00"
         },
         {
             "name": "defuse/php-encryption",
@@ -446,7 +446,9 @@
     "packages-dev": [],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": [],
+    "stability-flags": {
+        "danny.cain/introspect": 20
+    },
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": [],

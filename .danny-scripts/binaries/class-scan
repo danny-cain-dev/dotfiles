@@ -1,13 +1,9 @@
 #!/usr/bin/env php
 <?php
 
-use DannyCain\Crypto\Asymmetric\OpenSSLAsymmetricCrypto;
-use DannyCain\Crypto\Crypto;
-use DannyCain\Crypto\Symmetric\DefuseSymmetricEncryption;
-
 $vendorPath = __DIR__;
 while(!file_exists($vendorPath.DIRECTORY_SEPARATOR.'vendor') && strlen($vendorPath) > 0) {
-	$vendorPath = dirname($vendorPath);
+    $vendorPath = dirname($vendorPath);
 }
 require $vendorPath.DIRECTORY_SEPARATOR.'vendor'.DIRECTORY_SEPARATOR.'autoload.php';
 
@@ -24,43 +20,43 @@ class IntrospectObserver implements \DannyCain\Introspect\Observers\PHPParserObs
     protected $class = '';
     protected $function = '';
 
-	function startFile( $filename = '' ) {
-		$this->file = $filename;
-		$this->namespace = '';
-		$this->class = '';
-		$this->function = '';
-		echo $filename."\n";
-	}
+    function startFile( $filename = '' ) {
+        $this->file = $filename;
+        $this->namespace = '';
+        $this->class = '';
+        $this->function = '';
+        echo $filename."\n";
+    }
 
-	function startNamespace( $namespace ) {
-		$this->namespace = $namespace;
-		$this->class = '';
-		$this->function = '';
-	}
+    function startNamespace( $namespace ) {
+        $this->namespace = $namespace;
+        $this->class = '';
+        $this->function = '';
+    }
 
-	function startClass( $class, $interfaces = [], $baseClass = '' ) {
-		$this->class = $class;
-		$this->function = '';
-	}
+    function startClass( $class, $interfaces = [], $baseClass = '' ) {
+        $this->class = $class;
+        $this->function = '';
+    }
 
-	function startInterface( $interface, $extends = [] ) {
-		$this->class = $interface;
-		$this->function = '';
-	}
+    function startInterface( $interface, $extends = [] ) {
+        $this->class = $interface;
+        $this->function = '';
+    }
 
-	function startFunction( $function, $arguments ) {
-		$this->function = $function;
-		echo "\t".$this->namespace.'\\'.$this->class.'::'.$function."\n";
-	}
+    function startFunction( $function, $arguments ) {
+        $this->function = $function;
+        echo "\t".$this->namespace.'\\'.$this->class.'::'.$function."\n";
+    }
 
-	function endBlock() {
-		if ($this->function != '')
-		    $this->function = '';
-		elseif($this->class != '')
+    function endBlock() {
+        if ($this->function != '')
+            $this->function = '';
+        elseif($this->class != '')
             $this->class = '';
-		elseif($this->namespace != '')
+        elseif($this->namespace != '')
             $this->namespace = '';
-	}
+    }
 }
 $observer = new IntrospectObserver();
 $parser = new \DannyCain\Introspect\Parsing\PHPParser($observer);
