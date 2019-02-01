@@ -29,15 +29,14 @@ $opts = getopt('h', array(
 	'key:',
 	'encrypt:',
 	'decrypt:',
-	'output:',
     'help'
 ));
 
 if (isset($opts['h']) || isset($opts['help'])) {
     echo "File encryption / decryption\n";
     echo "Usage: \n";
-    echo "\tcrypto --encrypt {file} --key {public_key} --output {{destination}}\n";
-    echo "\tcrypto --decrypt {file} --key {private_key} --output {{destination}}\n";
+    echo "\tcrypto --encrypt {file} --key {public_key}\n";
+    echo "\tcrypto --decrypt {file} --key {private_key}\n";
     echo "\tcrypto --generate {key_filename}\n";
     exit;
 }
@@ -55,11 +54,6 @@ if (!isset($opts['key'])) {
 	exit;
 }
 
-if (!isset($opts['output'])) {
-	echo "Must specify an output file\n";
-	exit;
-}
-
 if (!isset($opts['encrypt']) && !isset($opts['decrypt'])) {
 	echo "Must choose an action\n";
 	exit;
@@ -72,8 +66,8 @@ if (isset($opts['decrypt']) && strpos($key, 'ENCRYPTED') !== false) {
 }
 
 if (isset($opts['encrypt'])) {
-	$crypto->encodeStream(fopen($opts['encrypt'], 'r'), fopen($opts['output'], 'w'), $key, 1024);
+	$crypto->encodeStream(fopen($opts['encrypt'], 'r'), STDOUT, $key, 1024);
 } else {
-	$crypto->decodeStream(fopen($opts['decrypt'], 'r'), fopen($opts['output'], 'w'), $key, $passphrase);
+	$crypto->decodeStream(fopen($opts['decrypt'], 'r'), STDOUT, $key, $passphrase);
 }
 echo "Done\n";
