@@ -3,14 +3,13 @@
     "require" : {
         "phpseclib/phpseclib" : "2.0",
         "danny.cain/crypto" : "~0.1",
-        "danny.cain/dpress-core": "^1.0",
-        "danny.cain/dpress-generic": "^1.0",
-        "danny.cain/datalayer" : "^1.0",
+        "danny.cain/dpress-generic": "^2.0",
+        "danny.cain/datalayer" : "^1.1",
         "danny.cain/introspect" : "^0.3",
-        "vlucas/phpdotenv": "^2.2",
-        "danny.cain/dependencies" : "^1.0"
+        "vlucas/phpdotenv": "^2.2"
     },
     "repositories" : [
+        { "type": "composer", "url": "https://satis.rincewind.dannycain.com" }
     ],
     "autoload" : {
         "files" : [ "init.php" ]
