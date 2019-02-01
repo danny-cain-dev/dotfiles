@@ -10,7 +10,7 @@ use DannyCain\HTTPConfig\Parser;
 
 $vendorPath = __DIR__;
 while(!file_exists($vendorPath.DIRECTORY_SEPARATOR.'vendor') && strlen($vendorPath) > 0) {
-	$vendorPath = dirname($vendorPath);
+    $vendorPath = dirname($vendorPath);
 }
 require $vendorPath.DIRECTORY_SEPARATOR.'vendor'.DIRECTORY_SEPARATOR.'autoload.php';
 
@@ -27,12 +27,12 @@ class MixedContentListener implements CrawlerListener {
         for($i = 0; $i < strlen($this->status); $i ++) {
             echo chr(8);
         }
-	    for($i = 0; $i < strlen($this->status); $i ++) {
-		    echo " ";
-	    }
-	    for($i = 0; $i < strlen($this->status); $i ++) {
-		    echo chr(8);
-	    }
+        for($i = 0; $i < strlen($this->status); $i ++) {
+            echo " ";
+        }
+        for($i = 0; $i < strlen($this->status); $i ++) {
+            echo chr(8);
+        }
 
         $this->status = '';
     }
@@ -43,46 +43,46 @@ class MixedContentListener implements CrawlerListener {
         echo $this->status;
     }
 
-	function scan( URL $url ) {
-		if ($this->max > 0 && $this->count >= $this->max) {
-			return false;
-		}
+    function scan( URL $url ) {
+        if ($this->max > 0 && $this->count >= $this->max) {
+            return false;
+        }
 
-		if ($url->getProtocol() === 'http') {
-		    return false;
+        if ($url->getProtocol() === 'http') {
+            return false;
         }
         
-		$this->count ++;
-		if ($this->max > 0) {
-			$this->writeStatus("Scanned ".$this->count." / ".$this->max." urls");
+        $this->count ++;
+        if ($this->max > 0) {
+            $this->writeStatus("Scanned ".$this->count." / ".$this->max." urls");
         } else {
-			$this->writeStatus("Scanned ".$this->count." urls");
+            $this->writeStatus("Scanned ".$this->count." urls");
         }
         return true;
-	}
+    }
 
-	/**
-	 * @return int
-	 */
-	public function getMax(): int {
-		return $this->max;
-	}
+    /**
+     * @return int
+     */
+    public function getMax(): int {
+        return $this->max;
+    }
 
-	/**
-	 * @param int $max
-	 */
-	public function setMax( int $max ): void {
-		$this->max = $max;
-	}
+    /**
+     * @param int $max
+     */
+    public function setMax( int $max ): void {
+        $this->max = $max;
+    }
 
-	/**
-	 * @return int
-	 */
-	public function getCount(): int {
-		return $this->count;
-	}
+    /**
+     * @return int
+     */
+    public function getCount(): int {
+        return $this->count;
+    }
 
-	function foundURL( URL $sourcePage, URL $url, $tagName = '' ) {
+    function foundURL( URL $sourcePage, URL $url, $tagName = '' ) {
         if ($url->getProtocol() === 'http') {
             switch($tagName) {
                 case 'a':
@@ -92,66 +92,66 @@ class MixedContentListener implements CrawlerListener {
                     $this->links[(string)$sourcePage][] = (string)$url;
                     break;
                 default:
-	                if (!isset($this->mixedMode[(string)$sourcePage]))
-		                $this->mixedMode[(string)$sourcePage] = [];
-	                $this->mixedMode[(string)$sourcePage][] = (string)$url;
+                    if (!isset($this->mixedMode[(string)$sourcePage]))
+                        $this->mixedMode[(string)$sourcePage] = [];
+                    $this->mixedMode[(string)$sourcePage][] = (string)$url;
                     break;
             }
         }
-	}
+    }
 
-	function failedToRetrieve( URL $url, $response_code ) {
+    function failedToRetrieve( URL $url, $response_code ) {
         if (!isset($this->httpError[$response_code]))
             $this->httpError[$response_code] = [];
         $this->httpError[$response_code][] = (string)$url;
-	}
+    }
 
-	function foundRedirect( URL $sourcePage, URL $url ) {
+    function foundRedirect( URL $sourcePage, URL $url ) {
 
-	}
+    }
 
-	/**
-	 * @return array
-	 */
-	public function getMixedMode(): array {
-		return $this->mixedMode;
-	}
+    /**
+     * @return array
+     */
+    public function getMixedMode(): array {
+        return $this->mixedMode;
+    }
 
-	/**
-	 * @return array
-	 */
-	public function getLinks(): array {
-		return $this->links;
-	}
+    /**
+     * @return array
+     */
+    public function getLinks(): array {
+        return $this->links;
+    }
 
-	/**
-	 * @return array
-	 */
-	public function getHttpError(): array {
-		return $this->httpError;
-	}
+    /**
+     * @return array
+     */
+    public function getHttpError(): array {
+        return $this->httpError;
+    }
 
-	/**
-	 * @return int
-	 */
-	public function getVerbosity(): int {
-		return $this->verbosity;
-	}
+    /**
+     * @return int
+     */
+    public function getVerbosity(): int {
+        return $this->verbosity;
+    }
 
-	/**
-	 * @param int $verbosity
-	 */
-	public function setVerbosity( int $verbosity ): void {
-		$this->verbosity = $verbosity;
-	}
+    /**
+     * @param int $verbosity
+     */
+    public function setVerbosity( int $verbosity ): void {
+        $this->verbosity = $verbosity;
+    }
 
 }
 
 
 $options = getopt('v', ['domain:', 'max:']);
 if (!isset($options['domain'])) {
-	echo "Must specify domain\n";
-	exit;
+    echo "Usage: mixed-content-scan --domain {domain} [--max {max-requests}]\n";
+    exit;
 }
 
 $domain = $options['domain'];
@@ -175,10 +175,10 @@ if (isset($options['max'])) {
 }
 
 try {
-	$crawler->crawl(URL::Parse($domain));
-	$listener->clearStatus();
+    $crawler->crawl(URL::Parse($domain));
+    $listener->clearStatus();
 } catch(RuntimeException $e) {
-	$listener->clearStatus();
+    $listener->clearStatus();
     if ($e->getMessage() == 'abort') {
         echo "Max crawl limit reached\n";
     } else {
