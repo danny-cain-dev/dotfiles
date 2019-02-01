@@ -5,6 +5,7 @@
 !/.bash_completion.d
 !/.bazaar
 !/.composer
+!/.danny-scripts
 !/.dotfiles-docker
 !/.drush
 !/.elinks

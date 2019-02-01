@@ -1,0 +1,91 @@
+#!/usr/bin/env php
+<?php
+
+use Danny\Scripts\DataTransfer\Exporter;
+use DPress\Abstraction\DataLayer\DataLayer;
+use DPress\Abstraction\DataLayer\DataMapping\DataMapper;
+use DPress\Abstraction\DataLayer\Schema\SchemaManager;
+use DPress\Abstraction\DataLayer\SQL\SQLBuilder;
+use DPress\Abstraction\Dependencies\DefaultDependencyManager;
+use DPress\Abstraction\Dependencies\DependencyInjector;
+use DPress\Abstraction\Dependencies\Models\DependencyFactoryModel;
+use DPress\Generic\DataLayer\Databases\Generic\GenericDatabase;
+
+$vendorPath = __DIR__;
+while(!file_exists($vendorPath.DIRECTORY_SEPARATOR.'vendor') && strlen($vendorPath) > 1) {
+	$vendorPath = dirname($vendorPath);
+}
+if (!file_exists($vendorPath.DIRECTORY_SEPARATOR.'vendor')) {
+    echo "Unable to locate vendor directory\n";
+    exit;
+}
+
+require $vendorPath.DIRECTORY_SEPARATOR.'vendor'.DIRECTORY_SEPARATOR.'autoload.php';
+$config = fetchConfig('mysql-backup');
+
+function databaseFactory() {
+    global $config;
+
+    if (!isset($config['user'])) {
+        echo "Must configure database root user\n";
+        exit;
+    }
+
+    if (!isset($config['pass'])) {
+        echo "Must configure database root password\n";
+        exit;
+    }
+
+    return GenericDatabase::MySQL("localhost", $config['user'], $config['pass'], '', '');
+}
+
+function bootstrap() {
+	$database = databaseFactory();
+	$dependencies = new DependencyInjector(new DefaultDependencyManager(
+		array(
+			new DependencyFactoryModel('DPress\\Abstraction\\DataLayer\\Databases\\Database', 'DPress\\Abstraction\\DataLayer\\Databases\\Database', array(), true),
+			new DependencyFactoryModel('DPress\\Abstraction\\DataLayer\\DataLayer', 'DPress\\Abstraction\\DataLayer\\DataLayer', array(), true),
+			new DependencyFactoryModel('DPress\\Abstraction\\Events\\EventManager', 'DPress\\Abstraction\\Events\\DefaultEventManager', array(), true),
+			new DependencyFactoryModel('DPress\\Abstraction\\Routing\\Router', 'DPress\\Generic\\Routing\\GenericRouter', array(), true),
+			new DependencyFactoryModel('DPress\\Abstraction\\UI\\TemplateRenderer', 'DPress\\Generic\\UI\\GenericTemplateRenderer', array(), true),
+			new DependencyFactoryModel('DPress\\Abstraction\\UI\\AssetManager', 'DPress\\Generic\\UI\\DefaultAssetManager', array("", ""), true),
+		),
+		array(
+			'DPress\\Abstraction\\DataLayer\\Databases\\Database' => $database,
+		)
+	));
+
+	DPressBootstrap::Instance()->bootstrap($dependencies);
+}
+
+
+bootstrap();
+$database = DPress()->datalayer()->database();
+
+if (!isset($config['backup_path'])) {
+    echo "Must specify backup path\n";
+    exit;
+}
+
+$path = $config['backup_path'].DIRECTORY_SEPARATOR.date('Y-m-d').DIRECTORY_SEPARATOR;
+if (file_exists($path)) {
+    echo "Already backed up today\n";
+    exit;
+}
+
+mkdir($path, 0700, true);
+foreach($database->raw_query("SHOW DATABASES", array()) as $row) {
+    $database->raw_statement("USE ".$row['Database'], array());
+
+    $dbBackupPath = $path.$row['Database'].'.json';
+	$handle = fopen($dbBackupPath, 'w');
+	$exporter = new Exporter($database, $handle);
+	$exporter->export();
+	fclose($handle);
+}
+
+if (file_exists($config['backup_path'].DIRECTORY_SEPARATOR.'.git')) {
+    chdir($config['backup_path']);
+    exec("git add -A .");
+    exec("git commit -m\"backups ".date('Y-m-d')."\"");
+}
