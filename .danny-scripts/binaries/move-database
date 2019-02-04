@@ -1,0 +1,62 @@
+#!/usr/bin/env php
+<?php
+
+$options = getopt('', [
+    'user:',
+    'host:',
+    'from:',
+    'to:',
+]);
+
+$user = $options['user'] ?? 'root';
+$host = $options['host'] ?? 'localhost';
+$source = $options['from'] ?? '';
+$dest = $options['to'] ?? '';
+
+exec("stty -echo");
+echo "Password for {$user}:";
+$password = trim(fgets(STDIN));
+exec("stty echo");
+echo "\n";
+
+if ($source === '') {
+    echo "Enter source database:";
+    $source = trim(fgets(STDIN));
+}
+if ($dest === '') {
+    echo "Enter target database:";
+    $dest = trim(fgets(STDIN));
+}
+
+$database = new PDO("mysql:host=$host", $user, $password);
+$query = $database->query("SHOW TABLES IN `$source`");
+if ($query === false) {
+    echo "Source database doesn't exist\n";
+    exit;
+}
+
+$tables = [];
+while($row = $query->fetch(PDO::FETCH_NUM)) {
+    $tables[] = $row[0];
+}
+
+$query = $database->query("SHOW TABLES IN `$dest`");
+if ($query === false) {
+    echo "Target database doesn't exist\n";
+    exit;
+}
+
+$existing_tables = [];
+while($row = $query->fetch(PDO::FETCH_NUM)) {
+    $existing_tables[] = $row[0];
+}
+
+foreach($tables as $table) {
+    if (in_array($table, $existing_tables)) {
+        echo "`$table` already exists, skipping\n";
+        continue;
+    }
+
+    $database->exec("RENAME TABLE `$source`.`$table` TO `$dest`.`$table`");
+}
+

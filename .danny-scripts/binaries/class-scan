@@ -18,75 +18,42 @@ interface Disposable {
     function dispose();
 }
 
-class CLIIntrospectObserver implements \DannyCain\Introspect\Observers\PHPParserObserver, Disposable {
+abstract class ScanObserver implements \DannyCain\Introspect\Observers\PHPParserObserver, Disposable {
+    protected $excludedDirectories = [];
+
     protected $file = '';
     protected $namespace = '';
     protected $class = '';
     protected $function = '';
 
-    function startFile( $filename = '' ) {
-        $this->file = $filename;
-        $this->namespace = '';
-        $this->class = '';
-        $this->function = '';
-        echo $filename."\n";
+    /**
+     * ScanObserver constructor.
+     *
+     * @param array $excludedDirectories
+     */
+    public function __construct(array $excludedDirectories = []) { $this->excludedDirectories = $excludedDirectories; }
+
+    /**
+     * @param array $excludedDirectories
+     */
+    public function setExcludedDirectories($excludedDirectories) {
+        $this->excludedDirectories = $excludedDirectories;
     }
 
-    function startNamespace( $namespace ) {
-        $this->namespace = $namespace;
-        $this->class = '';
-        $this->function = '';
-    }
-
-    function startClass( $class, $interfaces = [], $baseClass = '' ) {
-        $this->class = $class;
-        $this->function = '';
-    }
-
-    function startInterface( $interface, $extends = [] ) {
-        $this->class = $interface;
-        $this->function = '';
-    }
-
-    function startFunction( $function, $arguments ) {
-        $this->function = $function;
-        echo "\t".$this->namespace.'\\'.$this->class.'::'.$function."\n";
-    }
-
-    function endBlock() {
-        if ($this->function != '')
-            $this->function = '';
-        elseif($this->class != '')
-            $this->class = '';
-        elseif($this->namespace != '')
-            $this->namespace = '';
-    }
-
-    function dispose() {
-        // TODO: Implement dispose() method.
-    }
-}
-
-class JSONIntrospectObserver implements \DannyCain\Introspect\Observers\PHPParserObserver, Disposable {
-    private $tree = [];
-    protected $file = '';
-    protected $namespace = '';
-    protected $class = '';
-    protected $function = '';
-
-    private function deepSet($array, $keys, $val) {
-        $key = array_shift($keys);
-        if (count($keys) === 0) {
-            $array[$key] = $val;
-        } else {
-            $array[$key] = $this->deepSet($array[$key], $keys, $val);
+    protected function isExcluded() {
+        $parts = explode(DIRECTORY_SEPARATOR, $this->file);
+        foreach($this->excludedDirectories as $dir) {
+            if (in_array($dir, $parts)) {
+                return true;
+            }
         }
-        return $array;
+
+        return false;
     }
 
     function startFile( $filename = '' ) {
         $root = getcwd();
-        if (substr($filename, 0, strlen($root)) === strlen($root)) {
+        if (substr($filename, 0, strlen($root)) === $root) {
             $filename = substr($filename, strlen($root));
             if (substr($filename, 0, 1) === '/')
                 $filename = substr($filename, 1);
@@ -116,9 +83,6 @@ class JSONIntrospectObserver implements \DannyCain\Introspect\Observers\PHPParse
 
     function startFunction( $function, $arguments ) {
         $this->function = $function;
-
-        $keys = [$this->file, $this->namespace, $this->class, $function];
-        $this->tree = $this->deepSet($this->tree, $keys, $arguments);
     }
 
     function endBlock() {
@@ -129,6 +93,51 @@ class JSONIntrospectObserver implements \DannyCain\Introspect\Observers\PHPParse
         elseif($this->namespace != '')
             $this->namespace = '';
     }
+}
+
+class CLIIntrospectObserver extends ScanObserver {
+    function startFile( $filename = '' ) {
+        parent::startFile($filename);
+        if ($this->isExcluded())
+            return;
+
+        echo $filename."\n";
+    }
+
+    function startFunction( $function, $arguments ) {
+        parent::startFunction($function, $arguments);
+        if ($this->isExcluded())
+            return;
+
+        echo "\t".$this->namespace.'\\'.$this->class.'::'.$function."\n";
+    }
+
+    function dispose() {
+
+    }
+}
+
+class JSONIntrospectObserver extends ScanObserver {
+    private $tree = [];
+
+    private function deepSet($array, $keys, $val) {
+        $key = array_shift($keys);
+        if (count($keys) === 0) {
+            $array[$key] = $val;
+        } else {
+            $array[$key] = $this->deepSet($array[$key], $keys, $val);
+        }
+        return $array;
+    }
+
+    function startFunction( $function, $arguments ) {
+        parent::startFunction($function, $arguments);
+        if ($this->isExcluded())
+            return;
+
+        $keys = [$this->file, $this->namespace, $this->class, $function];
+        $this->tree = $this->deepSet($this->tree, $keys, $arguments);
+    }
 
     function dispose() {
         echo json_encode($this->tree, JSON_PRETTY_PRINT);
@@ -136,13 +145,19 @@ class JSONIntrospectObserver implements \DannyCain\Introspect\Observers\PHPParse
 }
 
 $opt = getopt('', [
-    'json'
+    'json',
+    'exclude:'
 ]);
 if (isset($opt['json'])) {
     $observer = new JSONIntrospectObserver();
 } else {
     $observer = new CLIIntrospectObserver();
 }
+
+$exclusions = isset($opt['exclude']) ? $opt['exclude'] : [];
+if (!is_array($exclusions))
+    $exclusions = [$exclusions];
+$observer->setExcludedDirectories($exclusions);
 
 $parser = new \DannyCain\Introspect\Parsing\PHPParser($observer);
 $parser->parseFiles($path);
