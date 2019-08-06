@@ -1,0 +1,153 @@
+#!/usr/bin/env php
+<?php
+
+use Ratchet\MessageComponentInterface;
+
+$vendorPath = __DIR__;
+while(!file_exists($vendorPath.DIRECTORY_SEPARATOR.'vendor') && strlen($vendorPath) > 0) {
+	$vendorPath = dirname($vendorPath);
+}
+require $vendorPath.DIRECTORY_SEPARATOR.'vendor'.DIRECTORY_SEPARATOR.'autoload.php';
+
+class WSConnectionDTO {
+
+	/**
+	 * @var \Ratchet\ConnectionInterface
+	 */
+    public $conn;
+    public $input;
+    public $output;
+    public $error;
+    public $proc;
+}
+
+class WSDespatcher implements MessageComponentInterface {
+
+	/**
+	 * @var \Danny\Scripts\Daemon\UI
+	 */
+    private $ui;
+
+    private $endpoints = [
+        'social.brill.alberon.co.uk' => [
+            'directory' => '/home/www/social.brill.alberon.co.uk/repo/',
+            'command' => 'art websocket'
+        ]
+    ];
+
+	/**
+	 * @var \WSConnectionDTO[]
+	 */
+    private $connections = [];
+
+	/**
+	 * WSDespatcher constructor.
+	 */
+	public function __construct() {
+	    global $ui;
+	    $this->ui = $ui;
+    }
+
+    public function close() {
+	    foreach($this->connections as $connection) {
+	        $connection->conn->close();
+		    pclose($connection->proc);
+        }
+    }
+
+    public function tick() {
+        foreach($this->connections as $connection) {
+            $output = fgets($connection->output);
+            $error = fgets($connection->error);
+            if ($output) {
+                $connection->conn->send($output);
+            }
+            if ($error) {
+                $this->ui->writeLine($error);
+            }
+        }
+    }
+
+	function onOpen(\Ratchet\ConnectionInterface $conn) {
+		/**
+		 * @var \Psr\Http\Message\RequestInterface $request
+		 */
+	    $request = $conn->httpRequest;
+        $this->ui->writeLine('Opened '.$request->getUri()->getHost().$request->getUri()->getPath());
+        $this->connections[spl_object_hash($conn)] = new WSConnectionDTO();
+        $this->connections[spl_object_hash($conn)]->conn = $conn;
+
+        $config = $this->endpoints[$request->getUri()->getHost()];
+        $dir = getcwd();
+
+        chdir($config['directory']);
+        $pipes = [];
+        $this->connections[spl_object_hash($conn)]->proc = proc_open($config['command'], [
+            ["pipe", "r"],
+            ["pipe", "w"],
+            ["pipe", "w"],
+        ], $pipes);
+
+        stream_set_blocking($pipes[1], false);
+        stream_set_blocking($pipes[2], false);
+
+		$this->connections[spl_object_hash($conn)]->input = $pipes[0];
+		$this->connections[spl_object_hash($conn)]->output = $pipes[1];
+		$this->connections[spl_object_hash($conn)]->error = $pipes[2];
+		chdir($dir);
+	}
+
+	function onClose(\Ratchet\ConnectionInterface $conn) {
+		/**
+		 * @var \Psr\Http\Message\RequestInterface $request
+		 */
+		$request = $conn->httpRequest;
+		$this->ui->writeLine('Closed '.$request->getUri());
+	}
+
+	function onError(\Ratchet\ConnectionInterface $conn, \Exception $e) {
+		/**
+		 * @var \Psr\Http\Message\RequestInterface $request
+		 */
+		$request = $conn->httpRequest;
+		$this->ui->writeLine('Errored '.$request->getUri());
+		$this->ui->writeLine($e->getMessage());
+	}
+
+	function onMessage(\Ratchet\ConnectionInterface $from, $msg) {
+		/**
+		 * @var \Psr\Http\Message\RequestInterface $request
+		 */
+		$request = $from->httpRequest;
+		fwrite($this->connections[spl_object_hash($from)]->input, $msg."\n");
+//		$this->ui->writeLine('Received from '.$request->getUri());
+//		$this->ui->writeLine($msg);
+//		$from->send(json_encode(['message' => 'Hiya!']));
+	}
+}
+
+function human_size($bytes, $decimals = 2){
+	$size = array('B','kB','MB','GB','TB','PB','EB','ZB','YB');
+	$factor = floor((strlen($bytes) - 1) / 3);
+	return sprintf("%.{$decimals}f", $bytes / pow(1024, $factor)) . @$size[$factor];
+}
+
+$ui = new \Danny\Scripts\Daemon\UI();
+$ui->bind();
+
+$loop = \React\EventLoop\Factory::create();
+$webSock = new React\Socket\Server('0.0.0.0:8080', $loop);
+$webSock = new React\Socket\SecureServer($webSock, $loop, ['local_cert' => dirname(__DIR__).'/cert/social.brill.alberon.co.uk.crt', 'local_pk' => dirname(__DIR__).'/cert/social.brill.alberon.co.uk.key', 'allow_self_signed' => true, 'verify_peer' => false]);
+$despatcher = new WSDespatcher();
+
+$loop->addPeriodicTimer(0.2, function() use($ui, $despatcher) {
+    $despatcher->tick();
+});
+
+$loop->addSignal(SIGINT, function() use($ui, $despatcher) {
+    $despatcher->close();
+    exit;
+});
+
+$server = new \Ratchet\Server\IoServer(new \Ratchet\Http\HttpServer(new \Ratchet\WebSocket\WsServer($despatcher)), $webSock, $loop);
+$loop->run();

@@ -81,3 +81,6 @@
 /bin/gitolite*
 /bin/gl-*
 /bin/sshkeys-lint
+
+# composer auth config
+.composer/auth.json
