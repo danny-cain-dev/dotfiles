@@ -81,3 +81,5 @@ if ! $MAC; then
     }
 
 fi
+
+alias mux=tmuxinator
