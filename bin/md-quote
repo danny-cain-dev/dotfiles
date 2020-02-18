@@ -1,0 +1,16 @@
+#!/bin/bash
+
+SESSION_TYPE=direct
+if [ -n "$SSH_CLIENT" ] || [ -n "$SSH_TTY" ]; then
+  SESSION_TYPE=remote
+else
+  case $(ps -o comm= -p $PPID) in
+    sshd|*/sshd) SESSION_TYPE=remote;;
+  esac
+fi
+
+
+sed -e 's/^/> /' /dev/clipboard > /dev/clipboard
+cat /dev/clipboard
+
+# xclip -selection clipboard

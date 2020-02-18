@@ -94,8 +94,6 @@ do
     fi
 done
 
-composer update -d ~/.danny-scripts
-
 # Create post-merge hook
 ln -nsf ../../bin/cfg-update .git/hooks/post-merge
 

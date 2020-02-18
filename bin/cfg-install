@@ -83,8 +83,6 @@ if [ ! -f ~/.bashrc_config ]; then
 
 fi
 
-composer update -d ~/.danny-scripts
-
 # Create .sudo_as_admin_successful to stop the help message at login
 #if [ ! -f ~/.sudo_as_admin_successful ] && groups | grep '\bsudo\b' >/dev/null; then
 #    touch ~/.sudo_as_admin_successful
