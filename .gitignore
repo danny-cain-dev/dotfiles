@@ -84,3 +84,6 @@
 # composer auth config
 .composer/auth.json
 .composer/vendor
+
+# danny things
+bin/slack
