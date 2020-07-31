@@ -87,3 +87,6 @@
 
 # danny things
 bin/slack
+bin/thor
+bin/erubis
+bin/tmuxinator
