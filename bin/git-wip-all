@@ -1,0 +1,31 @@
+#!/usr/bin/env php
+<?php
+$scripts = array_shift($argv);
+$dir = array_shift($argv);
+if (!$dir) {
+	$dir = getcwd();
+}
+
+$start = microtime(true);
+$dirty = [];
+$pattern = $dir.'/**/**/.git';
+$repositories = glob($pattern);
+foreach ($repositories as $repo) {
+	chdir(dirname($repo));
+	
+	exec('git diff --quiet 2>/dev/null', $output, $result);
+	if ($result === 1) {
+		$dirty[] = dirname($repo);
+	}
+}
+$end = microtime(true);
+
+foreach ($dirty as $repo) {
+	$repo = substr($repo, strlen($dir));
+	if (strpos($repo, '/') === 0) {
+		$repo = substr($repo, 1);
+	}
+	echo "\e[35m{$repo}"."\e[0m\n";
+}
+
+echo "\e[33mTook ".number_format($end - $start)." seconds\e[0m\n";
