@@ -20,6 +20,10 @@ foreach ($repositories as $repo) {
 }
 $end = microtime(true);
 
+if (count($dirty) === 0) {
+	echo "\e[34mAll repo's are committed\e[0m\n";
+}
+
 foreach ($dirty as $repo) {
 	$repo = substr($repo, strlen($dir));
 	if (strpos($repo, '/') === 0) {
