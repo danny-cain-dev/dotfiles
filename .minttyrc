@@ -1,5 +1,5 @@
 BoldAsFont=no
-Font=Fixedsys Excelsior 3.01-L2 Mono
+Font=Consolas
 CursorType=block
 RightClickAction=paste
 Term=xterm-256color
