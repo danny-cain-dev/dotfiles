@@ -90,3 +90,4 @@ bin/slack
 bin/thor
 bin/erubis
 bin/tmuxinator
+bin/batch-resize
