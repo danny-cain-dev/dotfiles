@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+
+du -sh ./* | sort -h | tail -n5
