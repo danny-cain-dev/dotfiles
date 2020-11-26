@@ -91,3 +91,5 @@ bin/thor
 bin/erubis
 bin/tmuxinator
 bin/batch-resize
+bin/dotref
+
