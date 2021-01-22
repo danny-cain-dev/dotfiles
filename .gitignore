@@ -86,10 +86,11 @@
 .composer/vendor
 
 # danny things
-bin/slack
-bin/thor
-bin/erubis
-bin/tmuxinator
-bin/batch-resize
-bin/dotref
+/bin/slack
+/bin/thor
+/bin/erubis
+/bin/tmuxinator
+/bin/batch-resize
+/bin/dotref
+!/.tmuxinator/dev.yml
 
