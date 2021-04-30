@@ -47,7 +47,7 @@ windows:
       # synchronize: after
       panes:
         - 
-        - dotref
+        - watch utils md:view /home/danny/data/reference.md
         - 
         - 
   - dashboard: wtfutil
