@@ -93,4 +93,4 @@
 /bin/batch-resize
 /bin/dotref
 !/.tmuxinator/dev.yml
-
+!/reference/
