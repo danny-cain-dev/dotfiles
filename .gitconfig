@@ -149,3 +149,5 @@
 
 [tag]
     sort = version:refname
+[init]
+	defaultBranch = master

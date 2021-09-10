@@ -1,10 +1,15 @@
+alias ut='utils'
+
 if [[ -e ~/.utils ]]; then
 	utils self:update
 else
 	git clone git@gitlab.com:danny-cain/utilities.git ~/.utils
-	cd ~/.utils
-	cp .env.example .env
-	composer install --no-dev
+	
+	if [[ $? -eq 0 ]]; then
+		cd ~/.utils
+		cp .env.example .env
+		composer install --no-dev
+	fi
 fi
 
 #yarn() {
