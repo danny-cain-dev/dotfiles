@@ -1,4 +1,13 @@
 alias ut='utils'
+alias uta='utils apache:config'
+alias utap='utils apache:php-versions'
+
+alias lw='utils log:watch'
+alias lwl='utils log:watch laravel'
+alias lwa='utils log:watch apache'
+alias lwp='utils log:watch php'
+alias tc='utils trello:count'
+alias te='utils trello:estimate'
 
 if [[ -e ~/.utils ]]; then
 	utils self:update
@@ -11,6 +20,18 @@ else
 		composer install --no-dev
 	fi
 fi
+
+danny() {
+	echo "ut : Utils"
+	echo "uta : Utils - apache config"
+	echo "utap : Utils - apache php versions"
+	echo "lw : Utils - log watch"
+	echo "lwl : Utils - log watch laravel"
+	echo "lwa : Utils - log watch apache"
+	echo "lwp : Utils - log watch php"
+	echo "tc : Utils - trello count"
+	echo "te : Utils - trello estimate"
+}
 
 #yarn() {
     #if [ "$1" = "update" ]; then
