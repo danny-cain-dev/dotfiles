@@ -1,0 +1,51 @@
+#
+# This file is executed when Bash is loaded, but ONLY in an interactive session
+#
+
+# Add your own customisations here...
+alias ut='utils'
+alias uta='utils apache:config'
+alias utap='utils apache:php-versions'
+
+alias lw='utils log:watch'
+alias lwl='utils log:watch laravel'
+alias lwa='utils log:watch apache'
+alias lwp='utils log:watch php'
+alias tc='utils trello:count'
+alias te='utils trello:estimate'
+
+if [[ -e ~/.utils ]]; then
+    utils self:update
+else
+    git clone git@gitlab.com:danny-cain/utilities.git ~/.utils
+
+    if [[ $? -eq 0 ]]; then
+        cd ~/.utils
+        cp .env.example .env
+        composer install --no-dev
+    fi
+fi
+
+danny() {
+    echo "ut : Utils"
+    echo "uta : Utils - apache config"
+    echo "utap : Utils - apache php versions"
+    echo "lw : Utils - log watch"
+    echo "lwl : Utils - log watch laravel"
+    echo "lwa : Utils - log watch apache"
+    echo "lwp : Utils - log watch php"
+    echo "tc : Utils - trello count"
+    echo "te : Utils - trello estimate"
+}
+
+#yarn() {
+    #if [ "$1" = "update" ]; then
+        ## yarn run v1.19.1
+        ## error Command "update" not found.
+        ## info Visit https://yarnpkg.com/en/docs/cli/run for documentation about this command.
+        #shift
+        #command yarn upgrade "$@"
+    #else
+        #command yarn "$@"
+    #fi
+#}

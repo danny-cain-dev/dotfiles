@@ -1,0 +1,10 @@
+[core]
+    autocrlf = input
+    filemode = false
+
+[github]
+    user = danny-cain-dev
+
+[user]
+    name = Danny Cain
+    email = danny@alberon.co.uk
