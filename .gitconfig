@@ -6,7 +6,7 @@
     excludesfile = ~/.gitignore-global
     attributesfile = ~/.gitattributes-global
 	autocrlf = input
-	filemode = false
+	fileMode = false
 
 [color]
     branch = auto
