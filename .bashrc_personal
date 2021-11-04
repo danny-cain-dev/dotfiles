@@ -14,16 +14,18 @@ alias lwp='utils log:watch php'
 alias tc='utils trello:count'
 alias te='utils trello:estimate'
 
-if [[ -e ~/.utils ]]; then
-    utils self:update
-elif [[ -x "$(command -v php)" ]]; then
-	git clone git@gitlab.com:danny-cain/utilities.git ~/.utils
+if [[ -x "$(command -v php)" ]]; then
+	if [[ -e ~/.utils ]]; then
+		utils self:update
+	elif [[ -x "$(command -v git)" ]]; then
+		git clone git@gitlab.com:danny-cain/utilities.git ~/.utils
 
-    if [[ $? -eq 0 ]]; then
-        cd ~/.utils
-        cp .env.example .env
-        composer install --no-dev
-    fi
+		if [[ $? -eq 0 ]]; then
+			cd ~/.utils
+			cp .env.example .env
+			composer install --no-dev
+		fi
+	fi
 fi
 
 danny() {
