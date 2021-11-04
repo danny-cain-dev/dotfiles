@@ -16,7 +16,7 @@ alias te='utils trello:estimate'
 
 if [[ -e ~/.utils ]]; then
     utils self:update
-elsif ! [ -x "$(command -v php)" ]; then
+elif [[ -x "$(command -v php)" ]]; then
 	git clone git@gitlab.com:danny-cain/utilities.git ~/.utils
 
     if [[ $? -eq 0 ]]; then
