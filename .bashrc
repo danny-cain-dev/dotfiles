@@ -104,7 +104,7 @@ alias db='docker build'
 alias dc='docker-compose'
 alias dpkg-reconfigure="$sudo dpkg-reconfigure"
 alias dr='docker run'
-alias dri='docker run -it'
+alias dri='docker run -it --rm'
 
 alias gcm='g co master'
 alias grep="$(command -v grep-less)" # command -v makes it work with sudo
@@ -155,6 +155,7 @@ alias reload='exec bash -l'
 alias rm='rm -i'
 
 alias s='sudo '
+alias scra="$sudo systemctl reload apache2 && $sudo systemctl status apache2"
 alias service="$sudo service"
 alias shutdown="$sudo poweroff"
 alias snap="$sudo snap"
@@ -338,6 +339,14 @@ cwt() {
     else
         echo "Cannot find wp-content/themes/ directory" >&2
         return 1
+    fi
+}
+
+docker-compose() {
+    if dir="$(findup -x scripts/docker-compose.sh)"; then
+        "$dir/scripts/docker-compose.sh" "$@"
+    else
+        command docker-compose "$@"
     fi
 }
 
@@ -535,14 +544,28 @@ php() {
 }
 
 phpstorm() {
-    # Automatically launch the current project, if possible, and run in the background
-    if [ $# -gt 0 ]; then
-        command phpstorm "$@" &>> ~/.cache/phpstorm.log &
-    elif local path=$(findup -d .idea); then
-        command phpstorm "$path" &>> ~/.cache/phpstorm.log &
-    else
-        command phpstorm &>> ~/.cache/phpstorm.log &
+    args=()
+
+    if [[ $# -eq 0 ]] && local path=$(findup -d .idea); then
+
+        # Automatically launch the current project
+        if is-wsl; then
+            path=$(wslpath -aw "$path" | sed 's/\\\\wsl.localhost\\/\\\\wsl$\\/')
+        fi
+
+        args=($path)
+
+    elif [[ -d ${1:-} ]] && is-wsl; then
+
+        # Convert the path to WSL format
+        path=$(wslpath -aw "$1" | sed 's/\\\\wsl.localhost\\/\\\\wsl$\\/')
+        shift
+        args=($path)
+
     fi
+
+    # Run PhpStorm in the background
+    command phpstorm "${args[@]}" "$@" &>> ~/.cache/phpstorm.log &
 }
 
 prevd() {
@@ -685,11 +708,18 @@ xdebug() {
 yarn() {
     # Make 'yarn' more like 'composer'
     case $1 in
-        in|ins) shift; command yarn install "$@" ;;
-        out) shift; command yarn outdated "$@" ;;
-        up|update) shift; command yarn upgrade "$@" ;;
-        *) command yarn "$@" ;;
+        in|ins) shift; args=(install) ;;
+        out) shift; args=(outdated) ;;
+        re|rem) shift; args=(remove) ;;
+        up|update) shift; args=(upgrade) ;;
+        *) args=() ;;
     esac
+
+    if dir="$(findup -x scripts/yarn.sh)"; then
+        "$dir/scripts/yarn.sh" "${args[@]}" "$@"
+    else
+        command yarn "${args[@]}" "$@"
+    fi
 }
 
 

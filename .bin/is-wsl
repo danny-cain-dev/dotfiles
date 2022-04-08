@@ -6,6 +6,11 @@ if [[ ! -f /proc/version ]]; then
     exit 1
 fi
 
+if is-docker; then
+    # Could be Docker running on WSL, which is not the same as WSL itself
+    exit 1
+fi
+
 if ! grep -iq 'microsoft' /proc/version; then
     # Not WSL
     exit 1
@@ -17,8 +22,8 @@ if [[ -z ${1:-} ]]; then
 fi
 
 # Check version
-# https://github.com/microsoft/WSL/issues/4555#issuecomment-539674785
-if [[ $(grep -oE 'gcc version ([0-9]+)' /proc/version | awk '{print $3}') -gt 5 ]]; then
+# https://github.com/microsoft/WSL/issues/4555#issuecomment-647561393
+if grep -q Hyper-V /proc/interrupts; then
     version=2
 else
     version=1
