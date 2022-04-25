@@ -2,7 +2,7 @@
 
 [These dotfiles](https://github.com/alberon/dotfiles) are for use on shared or personal Alberon accounts.
 
-You can also fork them to make your own copy, which you can customise to your liking (see below).
+You can also fork them to make your own copy, which you can customise to your liking ([see below](#how-to-fork-dotfiles)).
 
 ## Installation
 
@@ -340,35 +340,35 @@ The `t` command makes it easy to run scripts specific to a project (or anywhere 
 repo/
 ├── ...
 └── scripts/
-    ├── download/
+    ├── deploy/
     │   ├── live.sh
     │   └── staging.sh
-    └── push.sh
+    └── php.sh
 ```
 
 To run these three scripts, you would normally type:
 
 ```bash
-scripts/download/live.sh
-scripts/download/staging.sh
-scripts/push.sh
+scripts/deploy/live.sh
+scripts/deploy/staging.sh
+scripts/php.sh
 ```
 
 But using the `t` command this is simplified to:
 
 ```bash
-t download live
-t download staging
-t push
+t deploy live
+t deploy staging
+t php
 ```
 
-Note that the file extension is not required (it can be any extension - e.g. `.sh`/`.php` - or no extension), and files in subdirectories become subcommands. It will automatically search up the directory tree, if you are in a subdirectory of the project - in that case it's equivalent to `../../scripts/push.sh` (for example).
+Note that the file extension is not required (it can be any extension - e.g. `.sh`/`.php` - or no extension), and files in subdirectories become subcommands. It will automatically search up the directory tree, if you are in a subdirectory of the project - in that case it's equivalent to `../../scripts/php.sh` (for example).
 
 You can also:
 
 - Type `t <name> [args...]` to run a script with arguments
 - Type `t` alone to list all the scripts available
-- Type `t <dir>` to list all the scripts in a subdirectory (e.g. `t download`)
+- Type `t <dir>` to list all the scripts in a subdirectory (e.g. `t deploy`)
 - Use tab-completion (e.g. `t d<tab> s<tab>` is 7 keys instead of 18)
 
 ## How to fork Dotfiles
