@@ -59,8 +59,11 @@ if [[ -s ~/.rvm/scripts/rvm ]]; then
     source ~/.rvm/scripts/rvm
 fi
 
-# The Fuck
-command -v thefuck &>/dev/null && eval $(thefuck --alias; echo ';'; thefuck --alias doh)
+# The F**k
+if command -v thefuck &>/dev/null; then
+    eval $(thefuck --alias 2>/dev/null)
+    eval $(thefuck --alias doh 2>/dev/null)
+fi
 
 
 #===============================================================================
@@ -976,7 +979,7 @@ bind '"\e[1;7C": "\200\C-a\C-knextd\C-m\201"'
 bind '"\e[1;7A": "\200\C-a\C-kc ..\C-m\201"'
 
 # Ctrl-Alt-Down
-if declare -f _fzf_setup_completion &>/dev/null; then
+if declare -f __fzf_cd__ &>/dev/null; then
     # See /usr/share/doc/fzf/examples/key-bindings.bash
     bind '"\e[1;7B": "\ec"'
 else
@@ -994,6 +997,7 @@ bind 'Space: magic-space'
 dirhistory_past=()
 dirhistory_future=()
 
+export DOCKER_USER="$(id -u):$(id -g)" # https://stackoverflow.com/a/68711840/167815
 export GPG_TTY=$(tty)
 export HISTCONTROL='ignoreboth'
 export HISTIGNORE='&'
