@@ -44,10 +44,14 @@ PATH="$HOME/.composer/vendor/bin:$PATH"
 PATH="$HOME/.composer/packages/vendor/bin:$PATH"
 
 PATH="$HOME/.bin:$PATH"
+PATH="$HOME/.bin/personal:$PATH"
+PATH="$HOME/.bin/local:$PATH"
 
 if is-wsl; then
     # Note: Can't use aliases because they interfere with _complete_alias
     PATH="$HOME/.bin/windows:$PATH"
+    PATH="$HOME/.bin/personal/windows:$PATH"
+    PATH="$HOME/.bin/local/windows:$PATH"
 fi
 
 # For tab completion with sudo
@@ -101,7 +105,7 @@ fi
 # Stop Perl complaining on cPanel servers
 # I did set in MinTTY, but it's not picked up
 # Using en_US instead of en_GB to stop Vim and less complaining
-if [[ ${LANG:-} = 'C.UTF-8' ]]; then
+if [[ ${LANG:-} = 'C.UTF-8' ]] && locale -a | grep en_US.utf8 >/dev/null; then
     export LANG='en_US.UTF-8'
     export LC_ALL='en_US.UTF-8'
 fi
@@ -229,3 +233,4 @@ chmod 600 ~/.ssh/config_dynamic
 
 # Use .bashrc for interactive shell settings
 source ~/.bashrc
+eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"

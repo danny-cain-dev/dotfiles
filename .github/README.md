@@ -2,7 +2,7 @@
 
 [These dotfiles](https://github.com/alberon/dotfiles) are for use on shared or personal Alberon accounts.
 
-You can also fork them to make your own copy, which you can customise to your liking (see below).
+You can also fork them to make your own copy, which you can customise to your liking ([see below](#how-to-fork-dotfiles)).
 
 ## Installation
 
@@ -24,7 +24,7 @@ setup-identity 'Your Name' 'yourname@alberon.co.uk'
 
 ### Installing on Windows Subsystem for Linux (WSL) with Windows Terminal
 
-Install the [Fira Code](https://github.com/tonsky/FiraCode) font.
+Optionally install the [Fira Code](https://github.com/tonsky/FiraCode) font.
 
 [Install Windows Terminal](https://www.microsoft.com/en-gb/p/windows-terminal/9n0dx20hk701#activetab=pivot:overviewtab). (Note: If you installed it *before* setting up Ubuntu, run "configure WSL shortcuts" to add the shortcuts.)
 
@@ -32,7 +32,14 @@ Click Start, search for `features` and select "Turn Windows features on or off".
 
 [Install Ubuntu](https://www.microsoft.com/en-us/p/ubuntu/9nblggh4msv6?activetab=pivot:overviewtab). Run it, wait while it completes setup, set a username and password when prompted, then quit.
 
-[Install VcXsrv](https://sourceforge.net/projects/vcxsrv/), then run XLaunch from the Start Menu. Accept the default settings except untick "Primary Selection". Save the configuration into the `shell:startup` folder so it's started automatically.
+If you are using WSL 1, [install VcXsrv](https://sourceforge.net/projects/vcxsrv/), then run XLaunch from the Start Menu. Accept the default settings except untick "Primary Selection". Save the configuration into the `shell:startup` folder so it's started automatically.
+
+If you are using WSL 2, [WSLg](https://github.com/microsoft/wslg) is installed automatically. If you prefer, you can install VcXsrv instead (see above) and disable WSLg by putting [this](https://github.com/microsoft/wslg/discussions/523#discussioncomment-1505900) in `c:\Users\<Username>\.wslconfig`:
+
+```ini
+[wsl2]
+guiApplications=false
+```
 
 Launch Windows Terminal from the start menu, click the tab dropdown menu, then Ubuntu.
 
@@ -333,35 +340,35 @@ The `t` command makes it easy to run scripts specific to a project (or anywhere 
 repo/
 ├── ...
 └── scripts/
-    ├── download/
+    ├── deploy/
     │   ├── live.sh
     │   └── staging.sh
-    └── push.sh
+    └── php.sh
 ```
 
 To run these three scripts, you would normally type:
 
 ```bash
-scripts/download/live.sh
-scripts/download/staging.sh
-scripts/push.sh
+scripts/deploy/live.sh
+scripts/deploy/staging.sh
+scripts/php.sh
 ```
 
 But using the `t` command this is simplified to:
 
 ```bash
-t download live
-t download staging
-t push
+t deploy live
+t deploy staging
+t php
 ```
 
-Note that the file extension is not required (it can be any extension - e.g. `.sh`/`.php` - or no extension), and files in subdirectories become subcommands. It will automatically search up the directory tree, if you are in a subdirectory of the project - in that case it's equivalent to `../../scripts/push.sh` (for example).
+Note that the file extension is not required (it can be any extension - e.g. `.sh`/`.php` - or no extension), and files in subdirectories become subcommands. It will automatically search up the directory tree, if you are in a subdirectory of the project - in that case it's equivalent to `../../scripts/php.sh` (for example).
 
 You can also:
 
 - Type `t <name> [args...]` to run a script with arguments
 - Type `t` alone to list all the scripts available
-- Type `t <dir>` to list all the scripts in a subdirectory (e.g. `t download`)
+- Type `t <dir>` to list all the scripts in a subdirectory (e.g. `t deploy`)
 - Use tab-completion (e.g. `t d<tab> s<tab>` is 7 keys instead of 18)
 
 ## How to fork Dotfiles
