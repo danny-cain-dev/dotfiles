@@ -47,6 +47,6 @@ windows:
       # synchronize: after
       panes:
         - 
-        - phpstorm
+        - 
         - 
         - 
