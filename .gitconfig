@@ -156,3 +156,6 @@
 [include]
     path = .gitconfig_personal
     path = .gitconfig_local
+[safe]
+	directory = /cygdrive/c/Users/Work/
+	directory = /cygdrive/c/Users/Work
