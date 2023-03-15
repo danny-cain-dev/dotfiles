@@ -233,4 +233,7 @@ chmod 600 ~/.ssh/config_dynamic
 
 # Use .bashrc for interactive shell settings
 source ~/.bashrc
-eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+
+if [[ -f /home/linuxbrew/.linuxbrew/bin/brew ]]; then
+    eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+fi
