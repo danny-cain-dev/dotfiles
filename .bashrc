@@ -463,7 +463,7 @@ hackit() {
 
     # Switch to the latest development version
     echo
-    git checkout master
+    git checkout main
 }
 
 m() {
