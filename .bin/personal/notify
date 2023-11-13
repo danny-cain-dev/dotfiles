@@ -17,10 +17,15 @@ if (!$topic) {
     exit;
 }
 
-$input = fopen('php://stdin', 'rb');
-$content = '';
-while (!feof($input)) {
-    $content .= fgets($input);
+$options = getopt('m:');
+
+$content = $options['m'] ?? null;
+if (!$content) {
+    $input = fopen('php://stdin', 'rb');
+    $content = '';
+    while (!feof($input)) {
+        $content .= fgets($input);
+    }
 }
 
 $curl = curl_init("https://ntfy.sh/{$topic}");
