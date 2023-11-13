@@ -1,6 +1,7 @@
 #!/usr/bin/env php
 <?php
 
+## Configuration file shoule be ~/.notify.json with "token" and "topic" keys
 $configurationFile = drush_server_home().'/.notify.json';
 if (!file_exists($configurationFile)) {
     echo "\e[31m{$configurationFile} doesn't exist.\e[0m\n";
