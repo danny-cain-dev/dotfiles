@@ -47,8 +47,6 @@ windows:
       # synchronize: after
       panes:
         - 
-        - utils md:cycle /home/danny/reference 5
-        - /home/danny/projects/daemon/bin/daemon
         - 
-  - dashboard: wtfutil
-  - ide: phpstorm
+        - 
+        - dave

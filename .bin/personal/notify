@@ -1,0 +1,57 @@
+#!/usr/bin/env php
+<?php
+
+## Configuration file shoule be ~/.notify.json with "token" and "topic" keys
+$configurationFile = drush_server_home().'/.notify.json';
+if (!file_exists($configurationFile)) {
+    echo "\e[31m{$configurationFile} doesn't exist.\e[0m\n";
+    exit;
+}
+
+$configuration = json_decode(file_get_contents($configurationFile), true);
+$token = $configuration['token'] ?? null;
+$topic = $configuration['topic'] ?? null;
+
+if (!$topic) {
+    echo "\e[31mTopic not set.\e[0m\n";
+    exit;
+}
+
+$options = getopt('m:');
+
+$content = $options['m'] ?? null;
+if (!$content) {
+    $input = fopen('php://stdin', 'rb');
+    $content = '';
+    while (!feof($input)) {
+        $content .= fgets($input);
+    }
+}
+
+$curl = curl_init("https://ntfy.sh/{$topic}");
+curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+curl_setopt($curl, CURLOPT_POSTFIELDS, $content);
+if ($token) {
+    curl_setopt($curl, CURLOPT_HTTPHEADER, ['Authorization: Bearer '.$token]);
+}
+$response = curl_exec($curl);
+// echo $response."\n";
+
+
+function drush_server_home() {
+  // Cannot use $_SERVER superglobal since that's empty during UnitUnishTestCase
+  // getenv('HOME') isn't set on Windows and generates a Notice.
+  $home = getenv('HOME');
+  if (!empty($home)) {
+    // home should never end with a trailing slash.
+    $home = rtrim($home, '/');
+  }
+  elseif (!empty($_SERVER['HOMEDRIVE']) && !empty($_SERVER['HOMEPATH'])) {
+    // home on windows
+    $home = $_SERVER['HOMEDRIVE'] . $_SERVER['HOMEPATH'];
+    // If HOMEPATH is a root directory the path can end with a slash. Make sure
+    // that doesn't happen.
+    $home = rtrim($home, '\\/');
+  }
+  return empty($home) ? NULL : $home;
+}

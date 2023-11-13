@@ -32,7 +32,14 @@ shopt -s extglob
 [[ -f /etc/bash_completion ]] && source /etc/bash_completion
 
 # fzf - fuzzy finder
-[[ -f ~/.fzf.bash ]] && source ~/.fzf.bash
+if [[ -f ~/.fzf.bash ]]; then
+    # Manual install
+    source ~/.fzf.bash
+else
+    # Ubuntu package
+    [[ -f /usr/share/doc/fzf/examples/key-bindings.bash ]] && source /usr/share/doc/fzf/examples/key-bindings.bash
+    [[ -f /usr/share/doc/fzf/examples/completion.bash ]] && source /usr/share/doc/fzf/examples/completion.bash
+fi
 
 # Google Cloud Shell
 [[ -f /google/devshell/bashrc.google ]] && source /google/devshell/bashrc.google
@@ -52,8 +59,11 @@ if [[ -s ~/.rvm/scripts/rvm ]]; then
     source ~/.rvm/scripts/rvm
 fi
 
-# The Fuck
-command -v thefuck &>/dev/null && eval $(thefuck --alias; echo ';'; thefuck --alias doh)
+# The F**k
+if command -v thefuck &>/dev/null; then
+    eval $(thefuck --alias 2>/dev/null)
+    eval $(thefuck --alias doh 2>/dev/null)
+fi
 
 
 #===============================================================================
@@ -95,11 +105,15 @@ fi
 
 alias b='c -'
 
+if command -v batcat &>/dev/null && ! command -v bat &>/dev/null; then
+    alias bat='batcat'
+fi
+
+alias cat="$HOME/.bin/bat-or-cat"
 alias chmox='chmod' # Common typo
 alias cp='cp -i'
 alias cy='cypress'
 
-alias d='docker'
 alias db='docker build'
 alias dc='docker-compose'
 alias dpkg-reconfigure="$sudo dpkg-reconfigure"
@@ -354,6 +368,10 @@ dump-path() {
     echo -e "${PATH//:/\\n}"
 }
 
+exitif() {
+    test "$@" && exit || return 0
+}
+
 g() {
     git "$@"
 }
@@ -361,6 +379,8 @@ g() {
 git() {
     if [[ $# -gt 0 ]]; then
         command git "$@"
+    elif command -v lazygit &>/dev/null; then
+        lazygit
     else
         command git status
     fi
@@ -443,7 +463,7 @@ hackit() {
 
     # Switch to the latest development version
     echo
-    git checkout master
+    git checkout main
 }
 
 m() {
@@ -496,7 +516,13 @@ marks() {
     if is-mac; then
         CLICOLOR_FORCE=1 command ls -lF "$HOME/.marks" | sed '1d;s/  / /g' | cut -d' ' -f9-
     else
-        command ls -l --color=always "$HOME/.marks" | sed '1d;s/  / /g' | cut -d' ' -f9-
+        command ls -l --color=always "$HOME/.marks" | sed '1d;s/  / /g' | cut -d' ' -f9- | {
+            if command -v column &>/dev/null; then
+                column -t
+            else
+                cat
+            fi
+        }
     fi
 }
 
@@ -544,9 +570,10 @@ php() {
 }
 
 phpstorm() {
-    args=()
+    local args=()
+    local path
 
-    if [[ $# -eq 0 ]] && local path=$(findup -d .idea); then
+    if [[ $# -eq 0 ]] && path=$(findup -d .idea); then
 
         # Automatically launch the current project
         if is-wsl; then
@@ -952,11 +979,11 @@ bind '"\e[1;7C": "\200\C-a\C-knextd\C-m\201"'
 bind '"\e[1;7A": "\200\C-a\C-kc ..\C-m\201"'
 
 # Ctrl-Alt-Down
-if declare -f _fzf_setup_completion &>/dev/null; then
-    # See .fzf/shell/key-bindings.bash
+if declare -f __fzf_cd__ &>/dev/null; then
+    # See /usr/share/doc/fzf/examples/key-bindings.bash
     bind '"\e[1;7B": "\ec"'
 else
-    bind '"\e[1;7B": "\C-a\C-kcd \e[Z"'
+    bind '"\e[1;7B": "\C-a\C-kc \e[Z"'
 fi
 
 # Space - Expand history (!!, !$, etc.) immediately
@@ -970,6 +997,8 @@ bind 'Space: magic-space'
 dirhistory_past=()
 dirhistory_future=()
 
+export DOCKER_USER="$(id -u):$(id -g)" # https://stackoverflow.com/a/68711840/167815
+export GPG_TTY=$(tty)
 export HISTCONTROL='ignoreboth'
 export HISTIGNORE='&'
 export HISTSIZE=50000
@@ -1021,8 +1050,9 @@ prompt_hostname=$(get-full-hostname)
 #---------------------------------------
 # fzf - fuzzy finder
 #---------------------------------------
-
 # https://github.com/junegunn/fzf
+
+# Custom filters
 _fzf_compgen_path() {
     echo "$1"
     command find -L "$1" \
@@ -1073,6 +1103,7 @@ export FZF_ALT_C_OPTS="
     --preview 'tree -C {} | head -200'
 "
 
+# Type "cd #<Tab>" (and other commands) to trigger fzf - because the default "cd **<Tab>" is harder to type
 export FZF_COMPLETION_TRIGGER='#'
 
 if declare -f _fzf_setup_completion &>/dev/null; then
@@ -1085,6 +1116,15 @@ if declare -f _fzf_setup_completion &>/dev/null; then
     _fzf_setup_completion path g
     _fzf_setup_completion path git
 fi
+
+# Override Alt-C / Ctrl-Alt-Down to use 'c' instead of 'cd'
+# Based on /usr/share/doc/fzf/examples/key-bindings.bash
+__fzf_cd__() {
+  local cmd dir
+  cmd="${FZF_ALT_C_COMMAND:-"command find -L . -mindepth 1 \\( -path '*/\\.*' -o -fstype 'sysfs' -o -fstype 'devfs' -o -fstype 'devtmpfs' -o -fstype 'proc' \\) -prune \
+    -o -type d -print 2> /dev/null | cut -b3-"}"
+  dir=$(eval "$cmd" | FZF_DEFAULT_OPTS="--height ${FZF_TMUX_HEIGHT:-40%} --reverse $FZF_DEFAULT_OPTS $FZF_ALT_C_OPTS" $(__fzfcmd) +m) && printf 'c %q' "$dir"
+}
 
 
 #---------------------------------------
