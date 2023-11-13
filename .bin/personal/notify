@@ -17,7 +17,15 @@ if (!$topic) {
     exit;
 }
 
-$options = getopt('m:');
+$options = getopt('m:t:hu:');
+if (isset($options['h'])) {
+    echo "Usage: notify [-m\"Message\"] [-t\"comma separated tags\"] [-u\"URL\"]\n";
+    echo "\n";
+    echo "If `-m` is not specified, message will be read from standard input.\n";
+    echo "`t` is used for specifying tags for the message\n";
+    echo "`u` allows specifying a URL that will open on click.\n";
+    exit;
+}
 
 $content = $options['m'] ?? null;
 if (!$content) {
@@ -28,14 +36,31 @@ if (!$content) {
     }
 }
 
+$actions = [];
+if ($url = $options['u'] ?? null) {
+    $actions[] = "view, Open, {$url}, clear=true";
+}
+
+$headers = [];
+if ($token) {
+    $headers[] = "Authorization: Bearer {$token}";
+}
+
+if ($actions) {
+    $headers[] = "Actions: ".implode('; ', $actions);
+}
+
+if ($tags = $options['t'] ?? null) {
+    $headers[] = "X-Tags: {$tags}";
+}
+
 $curl = curl_init("https://ntfy.sh/{$topic}");
 curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
 curl_setopt($curl, CURLOPT_POSTFIELDS, $content);
 if ($token) {
-    curl_setopt($curl, CURLOPT_HTTPHEADER, ['Authorization: Bearer '.$token]);
+    curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
 }
 $response = curl_exec($curl);
-// echo $response."\n";
 
 
 function drush_server_home() {
