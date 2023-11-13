@@ -11,6 +11,7 @@ if (!file_exists($configurationFile)) {
 $configuration = json_decode(file_get_contents($configurationFile), true);
 $token = $configuration['token'] ?? null;
 $topic = $configuration['topic'] ?? null;
+$email = $configuration['email'] ?? null;
 
 if (!$topic) {
     echo "\e[31mTopic not set.\e[0m\n";
@@ -52,6 +53,10 @@ if ($actions) {
 
 if ($tags = $options['t'] ?? null) {
     $headers[] = "X-Tags: {$tags}";
+}
+
+if ($email) {
+    $headers[] = "Email: {$email}";
 }
 
 $curl = curl_init("https://ntfy.sh/{$topic}");
