@@ -1,0 +1,87 @@
+#!/usr/bin/env php
+<?php
+
+## Configuration file shoule be ~/.notify.json with "token" and "topic" keys
+$configurationFile = drush_server_home().'/.notify.json';
+if (!file_exists($configurationFile)) {
+    echo "\e[31m{$configurationFile} doesn't exist.\e[0m\n";
+    exit;
+}
+
+$configuration = json_decode(file_get_contents($configurationFile), true);
+$token = $configuration['token'] ?? null;
+$topic = $configuration['topic'] ?? null;
+$email = $configuration['email'] ?? null;
+
+if (!$topic) {
+    echo "\e[31mTopic not set.\e[0m\n";
+    exit;
+}
+
+$options = getopt('m:t:hu:');
+if (isset($options['h'])) {
+    echo "Usage: notify [-m\"Message\"] [-t\"comma separated tags\"] [-u\"URL\"]\n";
+    echo "\n";
+    echo "If `-m` is not specified, message will be read from standard input.\n";
+    echo "`t` is used for specifying tags for the message\n";
+    echo "`u` allows specifying a URL that will open on click.\n";
+    exit;
+}
+
+$content = $options['m'] ?? null;
+if (!$content) {
+    $input = fopen('php://stdin', 'rb');
+    $content = '';
+    while (!feof($input)) {
+        $content .= fgets($input);
+    }
+}
+
+$actions = [];
+if ($url = $options['u'] ?? null) {
+    $actions[] = "view, Open, {$url}, clear=true";
+}
+
+$headers = [];
+if ($token) {
+    $headers[] = "Authorization: Bearer {$token}";
+}
+
+if ($actions) {
+    $headers[] = "Actions: ".implode('; ', $actions);
+}
+
+if ($tags = $options['t'] ?? null) {
+    $headers[] = "X-Tags: {$tags}";
+}
+
+if ($email) {
+    $headers[] = "Email: {$email}";
+}
+
+$curl = curl_init("https://ntfy.sh/{$topic}");
+curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+curl_setopt($curl, CURLOPT_POSTFIELDS, $content);
+if ($token) {
+    curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
+}
+$response = curl_exec($curl);
+
+
+function drush_server_home() {
+  // Cannot use $_SERVER superglobal since that's empty during UnitUnishTestCase
+  // getenv('HOME') isn't set on Windows and generates a Notice.
+  $home = getenv('HOME');
+  if (!empty($home)) {
+    // home should never end with a trailing slash.
+    $home = rtrim($home, '/');
+  }
+  elseif (!empty($_SERVER['HOMEDRIVE']) && !empty($_SERVER['HOMEPATH'])) {
+    // home on windows
+    $home = $_SERVER['HOMEDRIVE'] . $_SERVER['HOMEPATH'];
+    // If HOMEPATH is a root directory the path can end with a slash. Make sure
+    // that doesn't happen.
+    $home = rtrim($home, '\\/');
+  }
+  return empty($home) ? NULL : $home;
+}
