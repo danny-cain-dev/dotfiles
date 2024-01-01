@@ -12,20 +12,29 @@ $configuration = json_decode(file_get_contents($configurationFile), true);
 $token = $configuration['token'] ?? null;
 $topic = $configuration['topic'] ?? null;
 $email = $configuration['email'] ?? null;
+$topicAliases = $configuration['topics'] ?? [];
 
-if (!$topic) {
-    echo "\e[31mTopic not set.\e[0m\n";
-    exit;
-}
-
-$options = getopt('m:t:hu:');
+$options = getopt('m:t:hu:s:');
 if (isset($options['h'])) {
-    echo "Usage: notify [-m\"Message\"] [-t\"comma separated tags\"] [-u\"URL\"]\n";
+    echo "Usage: notify [-m\"Message\"] [-t\"comma separated tags\"] [-u\"URL\"] [-s\"Topic\"]\n";
     echo "\n";
     echo "If `-m` is not specified, message will be read from standard input.\n";
     echo "`t` is used for specifying tags for the message\n";
     echo "`u` allows specifying a URL that will open on click.\n";
     exit;
+}
+
+if (isset($options['t'])) {
+    $topic = $options['t'];
+}
+
+if (!$topic) {
+    echo "\e[31mTopic not defined.\e[0m\n";
+    exit;
+}
+
+if (isset($topicAliases[$topic])) {
+    $topic = $topicAliases[$topic];
 }
 
 $content = $options['m'] ?? null;
