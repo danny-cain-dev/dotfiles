@@ -24,8 +24,8 @@ if (isset($options['h'])) {
     exit;
 }
 
-if (isset($options['t'])) {
-    $topic = $options['t'];
+if (isset($options['s'])) {
+    $topic = $options['s'];
 }
 
 if (!$topic) {
