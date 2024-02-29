@@ -81,6 +81,7 @@
 !/bin
 /bin/*
 !/bin/cfg-update
+/.bin/personal
 
 !.gitkeep
 

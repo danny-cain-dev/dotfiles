@@ -10,7 +10,7 @@ You can also fork them to make your own copy, which you can customise to your li
 
 ```bash
 cd
-wget alberon.uk/cfg
+wget al0.uk/cfg # Or: wget alberon.uk/cfg
 . cfg
 ```
 
@@ -69,7 +69,7 @@ Run "Ubuntu Terminal" from the start menu. Run:
 
 ```bash
 cd
-wget djm.me/cfg
+wget al0.uk/cfg # Or: wget alberon.uk/cfg
 . cfg
 ```
 
@@ -107,7 +107,7 @@ Then install dotfiles as above:
 
 ```bash
 cd
-wget djm.me/cfg
+wget al0.uk/cfg # Or: wget alberon.uk/cfg
 . cfg
 ```
 
@@ -147,7 +147,7 @@ Then install Dotfiles as normal:
 
 ```bash
 cd
-wget djm.me/cfg
+wget al0.uk/cfg # Or: wget alberon.uk/cfg
 . cfg
 ```
 
@@ -413,20 +413,5 @@ The recommended way to uninstall Dotfiles is to delete and recreate your account
 However, if that is not convenient, this will clean up most things:
 
 ```bash
-# Prepare an (almost) empty branch
-git checkout --orphan empty-branch
-git reset
-git add .gitignore
-git commit -m "Empty branch"
-
-# Delete the files by checking out the empty branch (leaves the ignored files alone)
-git add -A
-git checkout -f && reload
-
-# Delete the repo and a few ignored files
-rm -rf .git .gitignore .local/dotfiles-last-auto-update .ssh/config_dynamic .vim
-
-# Optionally, restore the default (skeleton) files
-cp -ir /etc/skel/. .
-exec bash -l
+source ~/.dotfiles/uninstall
 ```

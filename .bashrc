@@ -81,6 +81,7 @@ alias a2enmod="$sudo a2enmod"
 alias a2ensite="$sudo a2ensite"
 alias addgroup="$sudo addgroup"
 alias adduser="$sudo adduser"
+alias ap='ansible-playbook'
 
 if is-cygwin; then
     alias agi='apt-cyg install'
@@ -172,7 +173,6 @@ alias s='sudo '
 alias scra="$sudo systemctl reload apache2 && $sudo systemctl status apache2"
 alias service="$sudo service"
 alias shutdown="$sudo poweroff"
-alias snap="$sudo snap"
 alias sshak='ssh -o StrictHostKeyChecking=accept-new'
 alias sshstop='ssh -O stop'
 alias storm='phpstorm'
@@ -976,7 +976,7 @@ bind '"\e[1;7D": "\200\C-a\C-kprevd\C-m\201"'
 bind '"\e[1;7C": "\200\C-a\C-knextd\C-m\201"'
 
 # Ctrl-Alt-Up
-bind '"\e[1;7A": "\200\C-a\C-kc ..\C-m\201"'
+bind '"\e[1;7A": "\200\C-a\C-ku\C-m\201"'
 
 # Ctrl-Alt-Down
 if declare -f __fzf_cd__ &>/dev/null; then
