@@ -2,6 +2,7 @@
 
 if [ ! -d ~/bin/app-installer ]; then
     git clone git@ogg.cain.mobi:apps/installer.git ~/bin/app-installer
+    composer install --no-dev -d ~/bin/app-installer
 fi
 
 if [ ! -f ~/bin/app-installer/.env ]; then
