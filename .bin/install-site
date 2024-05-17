@@ -1,3 +1,12 @@
 #!/usr/bin/env bash
 
-php8.1 ~/bin/app-installer/scripts/install.php "@"
+if [ ! -d ~/bin/app-installer ]; then
+    git clone git@ogg.cain.mobi:apps/installer.git ~/bin/app-installer
+fi
+
+if [ ! -f ~/bin/app-installer/.env ]; then
+    echo "Configure .env file in ~bin/app-installer"
+    exit 1
+fi
+
+php8.1 ~/bin/app-installer/scripts/install.php "$@"
