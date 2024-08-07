@@ -40,6 +40,9 @@ danny() {
     echo "te : Utils - trello estimate"
 }
 
+echo "Public IP:"
+curl ip.network
+
 #yarn() {
     #if [ "$1" = "update" ]; then
         ## yarn run v1.19.1
