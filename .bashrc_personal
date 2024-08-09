@@ -42,6 +42,7 @@ danny() {
 
 echo "Public IP:"
 curl ip.network
+echo ""
 
 #yarn() {
     #if [ "$1" = "update" ]; then
