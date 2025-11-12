@@ -1,7 +1,7 @@
 # /home/danny/.config/tmuxinator/dev.yml
 
 name: dev
-root: ~/
+root: .
 
 # Optional tmux socket
 # socket_name: foo
