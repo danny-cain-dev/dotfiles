@@ -1205,3 +1205,8 @@ _ls-current-directory
 #source /etc/bash_completion.d/azure-cli
 #PS1=${PS1//\\h/Azure}
 #source /usr/bin/cloudshellhelp
+
+# opencode
+export PATH=/home/danny/.opencode/bin:$PATH
+# junie
+export PATH="$HOME/.local/bin:$PATH"
